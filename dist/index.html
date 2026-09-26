@@ -1,1 +1,284 @@
-PLACEHOLDER
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#D4758B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><circle cx='24' cy='24' r='22' fill='%23D4758B' opacity='.15'/><path d='M24 6C24 6 36 16 36 26C36 36 24 44 24 44C24 44 12 36 12 26C12 16 24 6 24 6Z' fill='%23D4758B'/></svg>">
+<title>Roselle</title>
+<style>
+:root{--primary:#D4758B;--primary-light:#E8A0BF;--primary-dark:#B85A72;--secondary:#957DAD;--accent:#F2B5A0;--bg:#FDF2F4;--surface:#fff;--surface-hover:#FFF5F7;--text-primary:#2D2D3A;--text-secondary:#6B6B80;--text-tertiary:#A0A0B0;--border:#F0E0E4;--shadow:0 2px 8px rgba(180,100,120,.08);--radius:14px;--radius-sm:10px;--nav-height:72px}
+[data-theme=dark]{--bg:#1C1C2E;--surface:#2A2A40;--surface-hover:#32324A;--text-primary:#E8E8F0;--text-secondary:#A0A0B8;--text-tertiary:#6B6B80;--border:#3A3A50;--shadow:0 2px 8px rgba(0,0,0,.2)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text-primary);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+#root{max-width:480px;margin:0 auto;min-height:100dvh;position:relative}
+.app-content{padding-bottom:calc(var(--nav-height) + env(safe-area-inset-bottom,0px) + 8px);min-height:100dvh}
+.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;gap:16px;color:var(--text-secondary)}
+.loading-logo{animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(.95)}}
+.page-loading{display:flex;align-items:center;justify-content:center;min-height:60vh}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;justify-content:space-around;align-items:center;background:var(--surface);border-top:1px solid var(--border);padding:8px 0 calc(8px + env(safe-area-inset-bottom,0px));height:calc(var(--nav-height) + env(safe-area-inset-bottom,0px));z-index:100;backdrop-filter:blur(12px)}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;color:var(--text-tertiary);font-size:10px;cursor:pointer;padding:4px 12px;transition:color .2s}
+.nav-item.active{color:var(--primary)}
+.nav-item span{font-weight:500}
+.nav-item svg{width:22px;height:22px}
+.page{padding:16px;padding-top:calc(16px + env(safe-area-inset-top,0px))}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px}
+.page-header h1{font-size:26px;font-weight:700}
+.header-date{color:var(--text-secondary);font-size:14px;margin-top:2px}
+.header-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover}
+.card{background:var(--surface);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:16px}
+.card h3{font-size:16px;font-weight:600;margin-bottom:12px}
+.btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px 24px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);font-size:16px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed}
+.btn-primary.saved{background:#6BB870}
+.btn-sm{padding:6px 14px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer}
+.btn-ghost{background:transparent;color:var(--primary)}
+.btn-outline{padding:10px 16px;background:transparent;color:var(--text-primary);border:2px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;transition:all .2s}
+.btn-outline.active{border-color:var(--primary);color:var(--primary);background:rgba(212,117,139,.07)}
+.btn-outline:disabled{opacity:.4;cursor:not-allowed}
+.icon-btn{background:none;border:none;color:var(--text-primary);cursor:pointer;padding:4px;display:flex}
+.tag{display:inline-block;padding:4px 10px;background:var(--surface-hover);border-radius:20px;font-size:12px;color:var(--text-secondary);margin:2px 4px 2px 0}
+.flow-tag{background:rgba(232,85,119,.13);color:#E85577}
+.mood-tag{background:rgba(149,125,173,.13);color:#957DAD}
+.temp-tag{background:rgba(78,173,173,.13);color:#4EADAD}
+.empty-state{text-align:center;padding:40px 20px}
+.empty-icon{font-size:48px;margin-bottom:16px}
+.empty-state h2{font-size:22px;margin-bottom:8px}
+.empty-state p{color:var(--text-secondary);margin-bottom:24px;line-height:1.5}
+.dashboard-grid{display:flex;gap:12px;margin-bottom:16px}
+.cycle-overview{flex:1;display:flex;flex-direction:column;align-items:center;padding:20px 16px}
+.next-period{text-align:center;margin-top:12px;font-size:14px;color:var(--text-secondary)}
+.period-due{color:var(--primary)!important;font-weight:600}
+.quick-stats{display:flex;flex-direction:column;gap:12px;width:140px}
+.stat-card{display:flex;align-items:center;gap:10px;cursor:pointer;transition:transform .15s}
+.stat-card:hover{transform:scale(1.02)}
+.stat-value{display:block;font-size:22px;font-weight:700}
+.stat-label{display:block;font-size:11px;color:var(--text-secondary)}
+.quick-actions{display:flex;gap:8px;margin-bottom:16px}
+.action-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;color:var(--primary);font-size:12px;font-weight:500;transition:all .2s}
+.action-btn:hover{background:var(--surface-hover)}
+.today-summary .today-tags,.recent-symptoms{display:flex;flex-wrap:wrap;gap:6px}
+.phase-indicator{position:relative;width:140px;height:140px}
+.phase-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.phase-day{font-size:28px;font-weight:700}
+.phase-name{font-size:13px;font-weight:600}
+.nutrition-card{background:var(--surface);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:16px}
+.nutrition-header{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.nutrition-icon{font-size:32px}
+.nutrition-header h3{font-size:16px;font-weight:600;margin:0}
+.nutrition-subtitle{font-size:12px;color:var(--text-secondary);margin-top:2px}
+.nutrition-description{font-size:13px;color:var(--text-secondary);line-height:1.5;margin-bottom:14px}
+.nutrition-categories{display:flex;flex-direction:column;gap:12px}
+.category-header{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;margin-bottom:6px}
+.category-items{display:flex;flex-wrap:wrap;gap:4px}
+.food-tag{display:inline-block;padding:4px 10px;background:var(--surface-hover);border-radius:16px;font-size:12px;color:var(--text-secondary)}
+.calendar-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.calendar-nav h2{font-size:18px;font-weight:600}
+.calendar-legend{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-secondary)}
+.legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.legend-dot.period{background:#E85577}
+.legend-dot.fertile{background:#6BB870}
+.legend-dot.ovulation{background:#4EADAD}
+.legend-dot.predicted{background:#E85577;opacity:.4}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:16px}
+.calendar-weekday{text-align:center;font-size:11px;font-weight:600;color:var(--text-tertiary);padding:8px 0}
+.calendar-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:none;border:none;border-radius:10px;cursor:pointer;font-size:14px;color:var(--text-primary);position:relative;transition:all .15s}
+.calendar-day:hover{background:var(--surface-hover)}
+.calendar-day.other-month{color:var(--text-tertiary);opacity:.4}
+.calendar-day.today{font-weight:700}
+.calendar-day.today .day-number{background:var(--primary);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.calendar-day.selected{background:var(--surface);box-shadow:var(--shadow)}
+.calendar-day.period{background:rgba(232,85,119,.13)}
+.calendar-day.predicted-period{background:rgba(232,85,119,.07);border:1px dashed rgba(232,85,119,.27)}
+.calendar-day.fertile{background:rgba(107,184,112,.09)}
+.calendar-day.ovulation{background:rgba(78,173,173,.13)}
+.day-dot{width:4px;height:4px;border-radius:50%;background:var(--primary);position:absolute;bottom:4px}
+.day-detail-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.day-detail-header h3{font-size:14px}
+.phase-badge{display:inline-block;padding:4px 10px;border-radius:16px;font-size:12px;font-weight:500;margin-right:6px;margin-bottom:8px}
+.day-detail-content{margin-top:8px}
+.day-detail-content p{font-size:13px;margin-bottom:4px;color:var(--text-secondary)}
+.day-symptoms{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.log-page .page-header{justify-content:space-between}
+.log-section{margin-bottom:24px}
+.log-section h3{font-size:15px;font-weight:600;margin-bottom:10px}
+.period-actions{display:flex;gap:8px}
+.flow-selector{display:flex;gap:6px;flex-wrap:wrap}
+.flow-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 12px;background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--text-secondary);transition:all .2s;flex:1;min-width:60px}
+.flow-btn.active{border-color:var(--primary);color:var(--primary);background:rgba(212,117,139,.03)}
+.flow-icon{font-size:18px}
+.mood-selector{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.mood-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 8px;background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:11px;color:var(--text-secondary);transition:all .2s}
+.mood-btn.active{border-color:var(--secondary);color:var(--secondary);background:rgba(149,125,173,.03)}
+.mood-emoji{font-size:24px}
+.energy-selector{padding:8px 0}
+.energy-slider{width:100%;accent-color:var(--primary)}
+.energy-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);margin-top:4px}
+.energy-value{font-weight:600;color:var(--primary)}
+.temp-input-wrapper{display:flex;align-items:center;gap:8px}
+.temp-input{flex:1;padding:12px;background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-sm);font-size:18px;color:var(--text-primary);outline:none;transition:border-color .2s}
+.temp-input:focus{border-color:var(--primary)}
+.temp-unit{font-size:18px;color:var(--text-secondary)}
+.notes-input{width:100%;padding:12px;background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--text-primary);resize:vertical;font-family:inherit;outline:none;transition:border-color .2s}
+.notes-input:focus{border-color:var(--primary)}
+.save-btn{margin-top:8px;margin-bottom:24px}
+.symptom-picker{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.symptom-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6px;background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:all .2s}
+.symptom-btn.active{background:var(--surface-hover)}
+.symptom-icon{font-size:20px}
+.symptom-label{font-size:10px;color:var(--text-secondary);text-align:center}
+.symptom-severity{font-size:9px;font-weight:600;text-transform:uppercase;min-height:13px}
+.symptom-hint{grid-column:1/-1;font-size:11px;color:var(--text-tertiary);text-align:center;margin-top:4px}
+.empty-chart{padding:32px 16px;text-align:center;color:var(--text-tertiary);font-size:14px}
+.insights-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+.stat-box{display:flex;flex-direction:column;align-items:center;padding:16px}
+.stat-number{font-size:28px;font-weight:700;color:var(--primary)}
+.stat-desc{font-size:12px;color:var(--text-secondary);margin-top:2px}
+.symptom-bars{display:flex;flex-direction:column;gap:8px}
+.symptom-bar-row{display:flex;align-items:center;gap:8px}
+.symptom-bar-label{font-size:12px;width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.symptom-bar-track{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.symptom-bar-fill{height:100%;background:var(--primary);border-radius:4px;transition:width .4s ease}
+.symptom-bar-count{font-size:12px;color:var(--text-secondary);width:24px;text-align:right}
+.mood-dist{display:flex;flex-direction:column;gap:8px}
+.mood-dist-item{display:flex;align-items:center;gap:8px}
+.mood-dist-emoji{font-size:18px}
+.mood-dist-label{font-size:13px;width:60px;text-transform:capitalize}
+.mood-dist-bar{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.mood-dist-fill{height:100%;background:var(--secondary);border-radius:4px;transition:width .4s}
+.mood-dist-pct{font-size:12px;color:var(--text-secondary);width:32px;text-align:right}
+.cycle-history{display:flex;flex-direction:column;gap:12px}
+.cycle-history-item{padding-bottom:12px;border-bottom:1px solid var(--border)}
+.cycle-history-item:last-child{border-bottom:none;padding-bottom:0}
+.cycle-history-dates{font-size:14px;margin-bottom:6px}
+.cycle-history-stats{display:flex;gap:6px}
+.account-profile{display:flex;flex-direction:column;align-items:center;text-align:center;padding:24px}
+.account-avatar{width:72px;height:72px;border-radius:50%;object-fit:cover;margin-bottom:12px}
+.account-avatar-placeholder{width:72px;height:72px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-tertiary);margin-bottom:12px}
+.profile-info h2{font-size:20px;margin-bottom:4px}
+.edit-name{width:100%}
+.name-input{width:100%;padding:10px;background:var(--bg);border:2px solid var(--border);border-radius:8px;font-size:16px;color:var(--text-primary);text-align:center;outline:none;margin-bottom:8px}
+.name-input:focus{border-color:var(--primary)}
+.edit-actions{display:flex;justify-content:center;gap:8px}
+.settings-list{padding:4px}
+.settings-item{display:flex;align-items:center;gap:12px;width:100%;padding:12px;background:none;border:none;font-size:15px;color:var(--text-primary);cursor:pointer;border-radius:8px;transition:background .15s}
+.settings-item:hover{background:var(--surface-hover)}
+.settings-item.danger{color:#E85577}
+.account-footer{text-align:center;font-size:12px;margin-top:24px}
+.login-page{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(135deg,var(--bg),#F5E6EB)}
+[data-theme=dark] .login-page{background:linear-gradient(135deg,var(--bg),#2A1F2E)}
+.login-content{text-align:center;max-width:360px;width:100%}
+.login-logo{margin-bottom:16px}
+.login-title{font-size:36px;font-weight:700;color:var(--primary);margin-bottom:4px}
+.login-subtitle{font-size:16px;color:var(--text-secondary);margin-bottom:16px}
+.login-description{font-size:14px;color:var(--text-secondary);line-height:1.6;margin-bottom:28px}
+.login-features{display:flex;flex-direction:column;gap:10px;margin-bottom:32px;text-align:left}
+.feature{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text-secondary)}
+.feature span:first-child{font-size:18px}
+.google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 24px;background:var(--surface);color:var(--text-primary);border:2px solid var(--border);border-radius:var(--radius-sm);font-size:16px;font-weight:500;cursor:pointer;transition:all .2s;box-shadow:var(--shadow)}
+.google-btn:hover{background:var(--surface-hover);border-color:var(--primary)}
+.google-btn:disabled{opacity:.6;cursor:not-allowed}
+.text-secondary{color:var(--text-secondary)}
+@media(min-width:481px){#root{border-left:1px solid var(--border);border-right:1px solid var(--border)}}
+</style>
+</head>
+<body>
+<div id="root"><div class="loading-screen"><div class="loading-logo"><svg width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#D4758B" opacity=".2"/><path d="M24 8C24 8 32 16 32 24C32 32 24 40 24 40C24 40 16 32 16 24C16 16 24 8 24 8Z" fill="#D4758B"/></svg></div><p>Loading...</p></div></div>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
+import React,{useState,useEffect,useMemo,useCallback,createContext,useContext} from 'https://esm.sh/react@18.3.1'
+import{createRoot} from 'https://esm.sh/react-dom@18.3.1/client?external=react'
+import{HashRouter,Routes,Route,Navigate,useNavigate,useLocation,useParams} from 'https://esm.sh/react-router-dom@6.26.0?external=react,react-dom'
+import htm from 'https://esm.sh/htm@3.1.1'
+import{differenceInDays,addDays,startOfDay,parseISO,format,startOfMonth,endOfMonth,startOfWeek,endOfWeek,eachDayOfInterval,isSameMonth,isSameDay,addMonths,subMonths,isToday} from 'https://esm.sh/date-fns@3.6.0'
+import{LineChart,Line,XAxis,YAxis,CartesianGrid,Tooltip,ResponsiveContainer,ReferenceLine} from 'https://esm.sh/recharts@2.12.7?external=react,react-dom'
+
+const h=htm.bind(React.createElement)
+const e=React.createElement
+
+const supabase=createClient('https://tuospgabbdstbqtqlcbo.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1b3NwZ2FiYmRzdGJxdHFsY2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA0NTc1OTIsImV4cCI6MjEwNjAzMzU5Mn0.5rKxiySeQK-a-gQ8SJ7MdIeyeAEpcGRAe9QiFZLJpfc')
+
+const AuthCtx=createContext({})
+const useAuth=()=>useContext(AuthCtx)
+function AuthProvider({children}){
+  const[user,setUser]=useState(null),[profile,setProfile]=useState(null),[loading,setLoading]=useState(true)
+  useEffect(()=>{supabase.auth.getSession().then(({data:{session}})=>{setUser(session?.user??null);if(session?.user)fp(session.user.id);else setLoading(false)});const{data:{subscription}}=supabase.auth.onAuthStateChange((_,session)=>{setUser(session?.user??null);if(session?.user)fp(session.user.id);else{setProfile(null);setLoading(false)}});return()=>subscription.unsubscribe()},[])
+  async function fp(uid){const{data}=await supabase.from('profiles').select('*').eq('id',uid).single();setProfile(data);setLoading(false)}
+  async function updateProfile(u){const{data,error}=await supabase.from('profiles').update(u).eq('id',user.id).select().single();if(!error)setProfile(data);return{data,error}}
+  async function signInWithGoogle(){return supabase.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+window.location.pathname}})}
+  async function signOut(){await supabase.auth.signOut();setUser(null);setProfile(null)}
+  return e(AuthCtx.Provider,{value:{user,profile,loading,signInWithGoogle,signOut,updateProfile}},children)
+}
+const ThemeCtx=createContext({})
+const useTheme=()=>useContext(ThemeCtx)
+function ThemeProvider({children}){
+  const[theme,setTheme]=useState(()=>localStorage.getItem('roselle-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))
+  useEffect(()=>{document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('roselle-theme',theme)},[theme])
+  return e(ThemeCtx.Provider,{value:{theme,toggleTheme:()=>setTheme(t=>t==='light'?'dark':'light')}},children)
+}
+
+function useCycles(){
+  const{user}=useAuth(),[cycles,setCycles]=useState([]),[loading,setLoading]=useState(true)
+  const fc=useCallback(async()=>{if(!user)return;setLoading(true);const{data}=await supabase.from('cycles').select('*').eq('user_id',user.id).order('start_date',{ascending:false});setCycles(data||[]);setLoading(false)},[user])
+  useEffect(()=>{fc()},[fc])
+  async function addCycle(c){const{data,error}=await supabase.from('cycles').insert({...c,user_id:user.id}).select().single();if(!error){setCycles(p=>[data,...p]);if(cycles.length>0){const prev=cycles[0],d=Math.round((new Date(c.start_date)-new Date(prev.start_date))/864e5);if(d>0){await supabase.from('cycles').update({cycle_length:d}).eq('id',prev.id);setCycles(p=>p.map(x=>x.id===prev.id?{...x,cycle_length:d}:x))}}};return{data,error}}
+  async function updateCycle(id,u){const{data,error}=await supabase.from('cycles').update(u).eq('id',id).select().single();if(!error)setCycles(p=>p.map(c=>c.id===id?data:c));return{data,error}}
+  return{cycles,loading,addCycle,updateCycle,refetch:fc}
+}
+function useDailyLogs(range){
+  const{user}=useAuth(),[logs,setLogs]=useState([]),[loading,setLoading]=useState(true)
+  const fl=useCallback(async()=>{if(!user)return;setLoading(true);let q=supabase.from('daily_logs').select('*').eq('user_id',user.id).order('date',{ascending:false});if(range?.start)q=q.gte('date',range.start);if(range?.end)q=q.lte('date',range.end);if(!range)q=q.limit(90);const{data}=await q;setLogs(data||[]);setLoading(false)},[user,range?.start,range?.end])
+  useEffect(()=>{fl()},[fl])
+  async function upsertLog(l){const ds=typeof l.date==='string'?l.date:format(l.date,'yyyy-MM-dd');const{data,error}=await supabase.from('daily_logs').upsert({...l,date:ds,user_id:user.id},{onConflict:'user_id,date'}).select().single();if(!error)setLogs(p=>{const i=p.findIndex(x=>x.date===ds);if(i>=0){const u=[...p];u[i]=data;return u}return[data,...p]});return{data,error}}
+  function getLog(d){const ds=typeof d==='string'?d:format(d,'yyyy-MM-dd');return logs.find(l=>l.date===ds)||null}
+  return{logs,loading,upsertLog,getLog,refetch:fl}
+}
+
+function calcAvg(cycles){if(!cycles?.length)return{acl:28,apd:5};const cc=cycles.filter(c=>c.cycle_length),cd=cycles.filter(c=>c.period_duration);return{acl:cc.length?Math.round(cc.reduce((s,c)=>s+c.cycle_length,0)/cc.length):28,apd:cd.length?Math.round(cd.reduce((s,c)=>s+c.period_duration,0)/cd.length):5}}
+function getCycleDay(start){if(!start)return null;return differenceInDays(startOfDay(new Date()),startOfDay(typeof start==='string'?parseISO(start):start))+1}
+function getPhase(day,acl=28,apd=5){if(!day||day<1)return{phase:'unknown',name:'Unknown',color:'#888'};if(day<=apd)return{phase:'menstrual',name:'Menstrual',color:'#E85577'};const od=Math.round(acl-14);if(day<=od-3)return{phase:'follicular',name:'Follicular',color:'#4EADAD'};if(day<=od+1)return{phase:'ovulation',name:'Ovulation',color:'#6BB870'};return{phase:'luteal',name:'Luteal',color:'#A06AB4'}}
+function daysUntilNext(start,acl=28){if(!start)return null;return Math.max(0,differenceInDays(startOfDay(addDays(typeof start==='string'?parseISO(start):start,acl)),startOfDay(new Date())))}
+function phaseForDate(date,start,acl=28,apd=5){if(!start)return null;const s=typeof start==='string'?parseISO(start):start,d=typeof date==='string'?parseISO(date):date,ds=differenceInDays(startOfDay(d),startOfDay(s));if(ds<0)return null;return getPhase((ds%acl)+1,acl,apd)}
+
+const NUTR={menstrual:{title:'Menstrual Phase',sub:'Days 1-5 • Replenishment',icon:'🌺',desc:'Your body needs iron and anti-inflammatory support.',cats:[{n:'Iron-Rich',i:'🥩',items:['Red meat','Lentils','Spinach','Dark chocolate','Chickpeas']},{n:'Anti-Inflammatory',i:'🍵',items:['Turmeric','Ginger tea','Salmon','Walnuts','Chia seeds']},{n:'Comfort',i:'🍲',items:['Bone broth','Soups & stews','Oatmeal','Sweet potatoes']},{n:'Magnesium',i:'🥜',items:['Almonds','Pumpkin seeds','Bananas','Avocado']},{n:'Hydrating',i:'💧',items:['Watermelon','Cucumber','Coconut water','Herbal teas']}]},follicular:{title:'Follicular Phase',sub:'Days 6-13 • Rising energy',icon:'🌱',desc:'Energy rising! Support estrogen metabolism with fresh foods.',cats:[{n:'Light & Fresh',i:'🥗',items:['Mixed salads','Sauerkraut','Kimchi','Fresh herbs']},{n:'Lean Proteins',i:'🍗',items:['Chicken breast','Fish','Eggs','Tempeh']},{n:'Probiotic',i:'🥛',items:['Greek yogurt','Kefir','Kombucha','Miso soup']},{n:'Cruciferous',i:'🥦',items:['Broccoli','Cauliflower','Brussels sprouts','Kale']},{n:'Complex Carbs',i:'🌾',items:['Oats','Quinoa','Brown rice','Sweet potatoes']}]},ovulation:{title:'Ovulation Phase',sub:'Days 14-16 • Peak energy',icon:'🌸',desc:'Peak energy! Support with fiber and anti-inflammatory foods.',cats:[{n:'Anti-Inflammatory',i:'🫐',items:['Berries','Turmeric','Green tea','Olive oil']},{n:'Fiber-Rich',i:'🥬',items:['Flaxseeds','Whole grains','Lentils','Pears']},{n:'Raw Produce',i:'🍓',items:['Berries','Bell peppers','Snap peas','Carrots']},{n:'Light Grains',i:'🌽',items:['Quinoa','Corn','Amaranth','Buckwheat']},{n:'Zinc-Rich',i:'🦐',items:['Shellfish','Pumpkin seeds','Cashews','Chickpeas']}]},luteal:{title:'Luteal Phase',sub:'Days 17-28 • Support & soothe',icon:'🍂',desc:'Focus on serotonin-boosting and bloat-reducing foods.',cats:[{n:'Serotonin Boosters',i:'🍠',items:['Sweet potatoes','Brown rice','Bananas','Oats']},{n:'B-Vitamins',i:'🐔',items:['Turkey','Chicken','Sunflower seeds','Eggs']},{n:'Magnesium',i:'🥬',items:['Dark leafy greens','Pumpkin seeds','Dark chocolate']},{n:'Calcium',i:'🧀',items:['Yogurt','Cheese','Broccoli','Almonds']},{n:'Reduce Bloating',i:'🥒',items:['Cucumber','Watermelon','Asparagus','Ginger']},{n:'Iron Prep',i:'🥩',items:['Red meat','Spinach','Lentils','Quinoa']}]}}
+const SYMPTOMS=[{key:'cramps',label:'Cramps',icon:'😣'},{key:'headache',label:'Headache',icon:'🤕'},{key:'bloating',label:'Bloating',icon:'🫧'},{key:'breast_tenderness',label:'Breast Tenderness',icon:'💗'},{key:'acne',label:'Acne',icon:'🔴'},{key:'back_pain',label:'Back Pain',icon:'🔙'},{key:'nausea',label:'Nausea',icon:'🤢'},{key:'cravings',label:'Cravings',icon:'🍫'},{key:'insomnia',label:'Poor Sleep',icon:'😴'}]
+const SEV=['none','mild','moderate','severe'],SEVC={none:'var(--text-tertiary)',mild:'#F2B5A0',moderate:'#E8A0BF',severe:'#E85577'}
+const MOODS=[{v:'happy',e:'😊',l:'Happy'},{v:'calm',e:'😌',l:'Calm'},{v:'neutral',e:'😐',l:'Neutral'},{v:'sad',e:'😢',l:'Sad'},{v:'anxious',e:'😰',l:'Anxious'},{v:'irritable',e:'😤',l:'Irritable'}]
+const FLOWS=[{v:null,l:'None',i:'○'},{v:'spotting',l:'Spotting',i:'💧'},{v:'light',l:'Light',i:'🩸'},{v:'medium',l:'Medium',i:'🩸🩸'},{v:'heavy',l:'Heavy',i:'🩸🩸🩸'}]
+
+const svgI={home:'<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',calendar:'<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/>',edit:'<path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/>',chart:'<path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M7 16l4-8 4 4 4-8"/>',user:'<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/>',droplets:'<path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"/>',therm:'<path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>',brain:'<path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/>',chevL:'<path d="m15 18-6-6 6-6"/>',chevR:'<path d="m9 18 6-6-6-6"/>',check:'<path d="M20 6 9 17l-5-5"/>',logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',moon:'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>'}
+function Icon({name,size=22,style={}}){return h`<span style=${{display:'inline-flex',width:size+'px',height:size+'px',...style}} dangerouslySetInnerHTML=${{__html:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(svgI[name]||'')+'</svg>'}}/>`}
+
+function BottomNav(){const loc=useLocation(),nav=useNavigate();const items=[{p:'/',icon:'home',l:'Home'},{p:'/calendar',icon:'calendar',l:'Calendar'},{p:'/log',icon:'edit',l:'Log'},{p:'/insights',icon:'chart',l:'Insights'},{p:'/account',icon:'user',l:'Account'}];return h`<nav class="bottom-nav">${items.map(it=>{const a=it.p==='/'?loc.pathname===it.p:loc.pathname.startsWith(it.p);return h`<button key=${it.p} class=${'nav-item'+(a?' active':'')} onClick=${()=>nav(it.p)}><${Icon} name=${it.icon}/><span>${it.l}</span></button>`})}</nav>`}
+
+function PhaseRing({phase,day,acl=28}){if(!phase||!day)return null;const pct=Math.min((day/acl)*100,100),circ=2*Math.PI*54,off=circ-(pct/100)*circ;return h`<div class="phase-indicator"><svg width="140" height="140" viewBox="0 0 140 140"><circle cx="70" cy="70" r="54" fill="none" stroke="var(--border)" stroke-width="8"/><circle cx="70" cy="70" r="54" fill="none" stroke=${phase.color} stroke-width="8" stroke-dasharray=${circ} stroke-dashoffset=${off} stroke-linecap="round" transform="rotate(-90 70 70)" style=${{transition:'stroke-dashoffset .6s ease'}}/></svg><div class="phase-inner"><span class="phase-day">Day ${day}</span><span class="phase-name" style=${{color:phase.color}}>${phase.name}</span></div></div>`}
+
+function NutritionCard({phase}){const d=NUTR[phase];if(!d)return null;return h`<div class="nutrition-card"><div class="nutrition-header"><span class="nutrition-icon">${d.icon}</span><div><h3>${d.title}</h3><p class="nutrition-subtitle">${d.sub}</p></div></div><p class="nutrition-description">${d.desc}</p><div class="nutrition-categories">${d.cats.map(c=>h`<div key=${c.n} class="nutrition-category"><div class="category-header"><span>${c.i}</span><span class="category-name">${c.n}</span></div><div class="category-items">${c.items.map(it=>h`<span key=${it} class="food-tag">${it}</span>`)}</div></div>`)}</div></div>`}
+
+function SymptomPicker({symptoms={},onChange}){return h`<div class="symptom-picker">${SYMPTOMS.map(s=>{const sv=symptoms[s.key]||'none',a=sv!=='none';return h`<button key=${s.key} class=${'symptom-btn'+(a?' active':'')} onClick=${()=>{const i=SEV.indexOf(sv);onChange({...symptoms,[s.key]:SEV[(i+1)%4]})}} style=${a?{borderColor:SEVC[sv]}:{}}><span class="symptom-icon">${s.icon}</span><span class="symptom-label">${s.label}</span><span class="symptom-severity" style=${{color:SEVC[sv]}}>${a?sv:''}</span></button>`})}<p class="symptom-hint">Tap to cycle: none → mild → moderate → severe</p></div>`}
+
+function TempChart({logs}){if(!logs?.length)return h`<div class="empty-chart"><p>No temperature data yet.</p></div>`;const data=logs.filter(l=>l.temperature).sort((a,b)=>new Date(a.date)-new Date(b.date)).map((l,i)=>({day:i+1,temp:Number(l.temperature),label:new Date(l.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}));if(!data.length)return h`<div class="empty-chart"><p>No temperature data yet.</p></div>`;const ts=data.map(d=>d.temp),mn=Math.floor(Math.min(...ts)*2)/2-.5,mx=Math.ceil(Math.max(...ts)*2)/2+.5,av=ts.reduce((a,b)=>a+b,0)/ts.length;return h`<div style=${{margin:'-8px -8px 0'}}><${ResponsiveContainer} width="100%" height=${220}><${LineChart} data=${data} margin=${{top:10,right:10,left:-20,bottom:0}}><${CartesianGrid} strokeDasharray="3 3" stroke="var(--border)"/><${XAxis} dataKey="label" tick=${{fill:'var(--text-secondary)',fontSize:11}} interval="preserveStartEnd"/><${YAxis} domain=${[mn,mx]} tick=${{fill:'var(--text-secondary)',fontSize:11}} tickFormatter=${v=>v+'°'}/><${Tooltip} contentStyle=${{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:'8px',color:'var(--text-primary)'}} formatter=${v=>[v+'°F','Temp']}/><${ReferenceLine} y=${av} stroke="var(--primary)" strokeDasharray="5 5"/><${Line} type="monotone" dataKey="temp" stroke="var(--primary)" strokeWidth=${2} dot=${{fill:'var(--primary)',r:4}} activeDot=${{r:6}}/><//><//></div>`}
+
+function LoginPage(){const{signInWithGoogle}=useAuth(),[ld,setLd]=useState(false);return h`<div class="login-page"><div class="login-content"><div class="login-logo"><svg width="80" height="80" viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="36" fill="var(--primary)" opacity=".15"/><circle cx="40" cy="40" r="24" fill="var(--primary)" opacity=".25"/><path d="M40 12C40 12 56 24 56 40C56 56 40 68 40 68C40 68 24 56 24 40C24 24 40 12 40 12Z" fill="var(--primary)"/><circle cx="40" cy="36" r="4" fill="white" opacity=".6"/></svg></div><h1 class="login-title">Roselle</h1><p class="login-subtitle">Your cycle, your way</p><p class="login-description">Track your period, understand your body, and get personalized nutrition recommendations for every phase of your cycle.</p><div class="login-features"><div class="feature"><span>🌸</span><span>Period & symptom tracking</span></div><div class="feature"><span>🥗</span><span>Phase-based nutrition</span></div><div class="feature"><span>🌡️</span><span>Temperature charting</span></div><div class="feature"><span>📊</span><span>Cycle insights & predictions</span></div></div><button class="google-btn" onClick=${async()=>{setLd(true);await signInWithGoogle();setLd(false)}} disabled=${ld}><svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>${ld?'Connecting...':'Continue with Google'}</button></div></div>`}
+
+function Dashboard(){const{profile}=useAuth(),{cycles,loading:cl}=useCycles(),{logs}=useDailyLogs(),nav=useNavigate();const{acl,apd}=useMemo(()=>calcAvg(cycles),[cycles]);const lc=cycles[0],cd=lc?getCycleDay(lc.start_date):null,ph=cd?getPhase(cd,acl,apd):null,du=lc?daysUntilNext(lc.start_date,acl):null;const tl=logs.find(l=>l.date===format(new Date(),'yyyy-MM-dd'));const rs=useMemo(()=>{const c={};logs.slice(0,7).forEach(l=>{if(l.symptoms)Object.entries(l.symptoms).forEach(([k,v])=>{if(v&&v!=='none')c[k]=(c[k]||0)+1})});return Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([k])=>k.replace(/_/g,' '))},[logs]);if(cl)return h`<div class="page-loading"><div class="spinner"/></div>`;return h`<div class="page dashboard-page"><header class="page-header"><div><h1>Hello${profile?.display_name?`, ${profile.display_name.split(' ')[0]}`:''}</h1><p class="header-date">${format(new Date(),'EEEE, MMMM d')}</p></div>${profile?.avatar_url&&h`<img src=${profile.avatar_url} alt="" class="header-avatar" referrerPolicy="no-referrer"/>`}</header>${!lc?h`<div class="empty-state"><div class="empty-icon">🌸</div><h2>Welcome to Roselle</h2><p>Log your first period to get started with cycle tracking, predictions, and personalized nutrition.</p><button class="btn-primary" onClick=${()=>nav('/log')}><${Icon} name="droplets" size=${18}/> Log Your Period</button></div>`:h`<><div class="dashboard-grid"><div class="cycle-overview card"><${PhaseRing} phase=${ph} day=${cd} acl=${acl}/>${du!=null&&du>0&&h`<p class="next-period">Next period in <strong>${du} day${du!==1?'s':''}</strong></p>`}${du===0&&h`<p class="next-period period-due">Period expected today</p>`}</div><div class="quick-stats"><div class="stat-card card" onClick=${()=>nav('/insights')}><${Icon} name="droplets" size=${20} style=${{color:'#E85577'}}/><div><span class="stat-value">${apd}</span><span class="stat-label">Avg. period</span></div></div><div class="stat-card card" onClick=${()=>nav('/insights')}><${Icon} name="brain" size=${20} style=${{color:'#A06AB4'}}/><div><span class="stat-value">${acl}</span><span class="stat-label">Avg. cycle</span></div></div></div></div>${tl&&h`<div class="today-summary card"><h3>Today's Log</h3><div class="today-tags">${tl.flow_intensity&&h`<span class="tag flow-tag">Flow: ${tl.flow_intensity}</span>`}${tl.mood&&tl.mood!=='neutral'&&h`<span class="tag mood-tag">Mood: ${tl.mood}</span>`}${tl.temperature&&h`<span class="tag temp-tag">${tl.temperature}°F</span>`}</div></div>`}${rs.length>0&&h`<div class="card"><h3>Recent Symptoms</h3><div class="recent-symptoms">${rs.map(s=>h`<span key=${s} class="tag">${s}</span>`)}</div></div>`}<div class="quick-actions"><button class="action-btn" onClick=${()=>nav('/log')}><${Icon} name="droplets" size=${20}/><span>Log Today</span></button><button class="action-btn" onClick=${()=>nav('/log')}><${Icon} name="therm" size=${20}/><span>Add Temp</span></button><button class="action-btn" onClick=${()=>nav('/calendar')}><${Icon} name="calendar" size=${20}/><span>Calendar</span></button></div>${ph&&h`<${NutritionCard} phase=${ph.phase}/>`}</>`}</div>`}
+
+function CalendarPage(){const[cm,setCm]=useState(new Date()),[sel,setSel]=useState(null),{cycles}=useCycles(),nav=useNavigate();const{logs,getLog}=useDailyLogs({start:format(startOfMonth(subMonths(cm,1)),'yyyy-MM-dd'),end:format(endOfMonth(addMonths(cm,1)),'yyyy-MM-dd')});const{acl,apd}=useMemo(()=>calcAvg(cycles),[cycles]),lc=cycles[0];const days=useMemo(()=>eachDayOfInterval({start:startOfWeek(startOfMonth(cm)),end:endOfWeek(endOfMonth(cm))}),[cm]);const pds=useMemo(()=>{const s=new Set();cycles.forEach(c=>{const st=parseISO(c.start_date),en=c.end_date?parseISO(c.end_date):addDays(st,(c.period_duration||apd)-1);eachDayOfInterval({start:st,end:en}).forEach(d=>s.add(format(d,'yyyy-MM-dd')))});return s},[cycles,apd]);const fds=useMemo(()=>{const s=new Set();logs.forEach(l=>{if(l.flow_intensity)s.add(l.date)});return s},[logs]);function info(date){const ds=format(date,'yyyy-MM-dd'),ip=pds.has(ds)||fds.has(ds),log=getLog(ds),fut=date>new Date();let ph=lc?phaseForDate(date,lc.start_date,acl,apd):null,iF=false,iO=false,iPP=false;if(lc){const ls=parseISO(lc.start_date);for(let i=0;i<6;i++){const cs=addDays(ls,acl*i),od=Math.round(acl-14),fs=addDays(cs,od-5),fe=addDays(cs,od+1);if(date>=fs&&date<=fe){iF=true;if(isSameDay(date,addDays(cs,od)))iO=true}if(fut&&i>0){const pe=addDays(cs,apd-1);if(date>=cs&&date<=pe)iPP=true}}};return{ip,iPP,iF,iO,ph,log,fut}};const sl=sel?getLog(format(sel,'yyyy-MM-dd')):null,si=sel?info(sel):null;return h`<div class="page calendar-page"><header class="page-header"><h1>Calendar</h1></header><div class="calendar-nav"><button class="icon-btn" onClick=${()=>setCm(m=>subMonths(m,1))}><${Icon} name="chevL" size=${24}/></button><h2>${format(cm,'MMMM yyyy')}</h2><button class="icon-btn" onClick=${()=>setCm(m=>addMonths(m,1))}><${Icon} name="chevR" size=${24}/></button></div><div class="calendar-legend"><span class="legend-item"><span class="legend-dot period"/>Period</span><span class="legend-item"><span class="legend-dot fertile"/>Fertile</span><span class="legend-item"><span class="legend-dot ovulation"/>Ovulation</span><span class="legend-item"><span class="legend-dot predicted"/>Predicted</span></div><div class="calendar-grid">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>h`<div key=${d} class="calendar-weekday">${d}</div>`)}${days.map(day=>{const inf=info(day),im=isSameMonth(day,cm);let cn='calendar-day';if(!im)cn+=' other-month';if(isToday(day))cn+=' today';if(sel&&isSameDay(day,sel))cn+=' selected';if(inf.ip)cn+=' period';if(inf.iPP)cn+=' predicted-period';if(inf.iF)cn+=' fertile';if(inf.iO)cn+=' ovulation';return h`<button key=${day.toISOString()} class=${cn} onClick=${()=>setSel(day)}><span class="day-number">${format(day,'d')}</span>${inf.log&&h`<span class="day-dot"/>`}</button>`})}</div>${sel&&h`<div class="day-detail card"><div class="day-detail-header"><h3>${format(sel,'EEEE, MMMM d, yyyy')}</h3><button class="btn-sm" onClick=${()=>nav('/log/'+format(sel,'yyyy-MM-dd'))}>${sl?'Edit':'Log'}</button></div>${si?.ph&&h`<span class="phase-badge" style=${{background:si.ph.color+'22',color:si.ph.color}}>${si.ph.name} Phase</span>`}${si?.iO&&h`<span class="phase-badge" style=${{background:'#6BB87022',color:'#6BB870'}}>Estimated Ovulation</span>`}${si?.iF&&!si?.iO&&h`<span class="phase-badge" style=${{background:'#6BB87022',color:'#6BB870'}}>Fertile Window</span>`}${sl&&h`<div class="day-detail-content">${sl.flow_intensity&&h`<p>Flow: <strong>${sl.flow_intensity}</strong></p>`}${sl.mood&&h`<p>Mood: <strong>${sl.mood}</strong></p>`}${sl.temperature&&h`<p>Temp: <strong>${sl.temperature}°F</strong></p>`}${sl.symptoms&&Object.entries(sl.symptoms).filter(([,v])=>v&&v!=='none').length>0&&h`<div class="day-symptoms">${Object.entries(sl.symptoms).filter(([,v])=>v&&v!=='none').map(([k,v])=>h`<span key=${k} class="tag">${k.replace(/_/g,' ')}: ${v}</span>`)}</div>`}</div>`}</div>`}</div>`}
+
+function LogPage(){const{date:dp}=useParams(),nav=useNavigate(),ld=dp||format(new Date(),'yyyy-MM-dd'),dd=parseISO(ld);const{logs,upsertLog,getLog}=useDailyLogs(),{cycles,addCycle,updateCycle}=useCycles();const[flow,setFlow]=useState(null),[mood,setMood]=useState('neutral'),[energy,setEnergy]=useState(3),[temp,setTemp]=useState(''),[syms,setSyms]=useState({}),[notes,setNotes]=useState(''),[saving,setSaving]=useState(false),[saved,setSaved]=useState(false),[pS,setPS]=useState(false),[pE,setPE]=useState(false);useEffect(()=>{const ex=getLog(ld);if(ex){setFlow(ex.flow_intensity);setMood(ex.mood||'neutral');setEnergy(ex.energy||3);setTemp(ex.temperature?String(ex.temperature):'');setSyms(ex.symptoms||{});setNotes(ex.notes||'')}},[ld,logs]);async function save(){setSaving(true);await upsertLog({date:ld,flow_intensity:flow,mood,energy,temperature:temp?parseFloat(temp):null,symptoms:syms,notes:notes||null});if(pS)await addCycle({start_date:ld});if(pE&&cycles[0]&&!cycles[0].end_date){const dur=Math.round((new Date(ld)-new Date(cycles[0].start_date))/864e5)+1;await updateCycle(cycles[0].id,{end_date:ld,period_duration:dur})};setSaving(false);setSaved(true);setTimeout(()=>setSaved(false),2000)};return h`<div class="page log-page"><header class="page-header"><button class="icon-btn" onClick=${()=>nav(-1)}><${Icon} name="chevL" size=${24}/></button><h1>${format(dd,'MMM d, yyyy')}</h1><div style=${{width:40}}/></header><div class="log-section"><h3>Period</h3><div class="period-actions"><button class=${'btn-outline'+(pS?' active':'')} onClick=${()=>{setPS(!pS);if(!pS)setPE(false)}}>Period Started</button><button class=${'btn-outline'+(pE?' active':'')} onClick=${()=>{setPE(!pE);if(!pE)setPS(false)}} disabled=${!cycles[0]||!!cycles[0]?.end_date}>Period Ended</button></div></div><div class="log-section"><h3>Flow</h3><div class="flow-selector">${FLOWS.map(l=>h`<button key=${l.l} class=${'flow-btn'+(flow===l.v?' active':'')} onClick=${()=>setFlow(l.v)}><span class="flow-icon">${l.i}</span><span>${l.l}</span></button>`)}</div></div><div class="log-section"><h3>Mood</h3><div class="mood-selector">${MOODS.map(m=>h`<button key=${m.v} class=${'mood-btn'+(mood===m.v?' active':'')} onClick=${()=>setMood(m.v)}><span class="mood-emoji">${m.e}</span><span>${m.l}</span></button>`)}</div></div><div class="log-section"><h3>Energy Level</h3><div class="energy-selector"><input type="range" min="1" max="5" value=${energy} onInput=${ev=>setEnergy(Number(ev.target.value))} class="energy-slider"/><div class="energy-labels"><span>Low</span><span class="energy-value">${energy}/5</span><span>High</span></div></div></div><div class="log-section"><h3>Temperature (BBT)</h3><div class="temp-input-wrapper"><input type="number" step="0.1" min="95" max="100" placeholder="e.g. 97.8" value=${temp} onInput=${ev=>setTemp(ev.target.value)} class="temp-input"/><span class="temp-unit">°F</span></div></div><div class="log-section"><h3>Symptoms</h3><${SymptomPicker} symptoms=${syms} onChange=${setSyms}/></div><div class="log-section"><h3>Notes</h3><textarea placeholder="How are you feeling today?" value=${notes} onInput=${ev=>setNotes(ev.target.value)} class="notes-input" rows="3"/></div><button class=${'btn-primary save-btn'+(saved?' saved':'')} onClick=${save} disabled=${saving}>${saved?h`<${Icon} name="check" size=${18}/> Saved!`:saving?'Saving...':'Save Log'}</button></div>`}
+
+function InsightsPage(){const{cycles}=useCycles(),{logs}=useDailyLogs();const{acl,apd}=useMemo(()=>calcAvg(cycles),[cycles]);const cls=useMemo(()=>cycles.filter(c=>c.cycle_length).map(c=>c.cycle_length),[cycles]);const vari=useMemo(()=>{if(cls.length<2)return null;const m=cls.reduce((a,b)=>a+b,0)/cls.length;return Math.round(Math.sqrt(cls.reduce((s,l)=>s+Math.pow(l-m,2),0)/cls.length)*10)/10},[cls]);const sp=useMemo(()=>{const c={};logs.forEach(l=>{if(l.symptoms)Object.entries(l.symptoms).forEach(([k,v])=>{if(v&&v!=='none'){if(!c[k])c[k]=0;c[k]++}})});return Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,8)},[logs]);const md=useMemo(()=>{const c={};logs.forEach(l=>{if(l.mood)c[l.mood]=(c[l.mood]||0)+1});return c},[logs]);const emo={happy:'😊',calm:'😌',neutral:'😐',sad:'😢',anxious:'😰',irritable:'😤'};return h`<div class="page insights-page"><header class="page-header"><h1>Insights</h1></header><div class="insights-stats"><div class="card stat-box"><span class="stat-number">${acl}</span><span class="stat-desc">Avg. Cycle</span></div><div class="card stat-box"><span class="stat-number">${apd}</span><span class="stat-desc">Avg. Period</span></div><div class="card stat-box"><span class="stat-number">${cycles.length}</span><span class="stat-desc">Cycles</span></div><div class="card stat-box"><span class="stat-number">${vari!=null?'±'+vari:'—'}</span><span class="stat-desc">Variability</span></div></div><div class="card"><h3>Temperature Chart</h3><${TempChart} logs=${logs}/></div>${sp.length>0&&h`<div class="card"><h3>Common Symptoms</h3><div class="symptom-bars">${sp.map(([k,ct])=>{const pct=Math.round((ct/sp[0][1])*100),si=SYMPTOMS.find(s=>s.key===k);return h`<div key=${k} class="symptom-bar-row"><span class="symptom-bar-label">${si?.icon} ${k.replace(/_/g,' ')}</span><div class="symptom-bar-track"><div class="symptom-bar-fill" style=${{width:pct+'%'}}/></div><span class="symptom-bar-count">${ct}</span></div>`})}</div></div>`}${Object.keys(md).length>0&&h`<div class="card"><h3>Mood Distribution</h3><div class="mood-dist">${Object.entries(md).sort((a,b)=>b[1]-a[1]).map(([m,c])=>{const t=Object.values(md).reduce((a,b)=>a+b,0);return h`<div key=${m} class="mood-dist-item"><span class="mood-dist-emoji">${emo[m]||'😐'}</span><span class="mood-dist-label">${m}</span><div class="mood-dist-bar"><div class="mood-dist-fill" style=${{width:(c/t*100)+'%'}}/></div><span class="mood-dist-pct">${Math.round(c/t*100)}%</span></div>`})}</div></div>`}<div class="card"><h3>Cycle History</h3>${cycles.length===0?h`<p class="text-secondary">No cycles logged yet.</p>`:h`<div class="cycle-history">${cycles.map(c=>h`<div key=${c.id} class="cycle-history-item"><div class="cycle-history-dates"><span>${format(parseISO(c.start_date),'MMM d, yyyy')}</span>${c.end_date&&h`<span> — ${format(parseISO(c.end_date),'MMM d, yyyy')}</span>`}</div><div class="cycle-history-stats">${c.cycle_length&&h`<span class="tag">${c.cycle_length}d cycle</span>`}${c.period_duration&&h`<span class="tag">${c.period_duration}d period</span>`}</div></div>`)}</div>`}</div></div>`}
+
+function AccountPage(){const{user,profile,signOut,updateProfile}=useAuth(),{theme,toggleTheme}=useTheme(),[editing,setEditing]=useState(false),[dn,setDn]=useState(profile?.display_name||'');return h`<div class="page account-page"><header class="page-header"><h1>Account</h1></header><div class="account-profile card">${profile?.avatar_url?h`<img src=${profile.avatar_url} alt="" class="account-avatar" referrerPolicy="no-referrer"/>`:h`<div class="account-avatar-placeholder"><${Icon} name="user" size=${32}/></div>`}${editing?h`<div class="edit-name"><input type="text" value=${dn} onInput=${ev=>setDn(ev.target.value)} class="name-input"/><div class="edit-actions"><button class="btn-sm" onClick=${async()=>{await updateProfile({display_name:dn});setEditing(false)}}>Save</button><button class="btn-sm btn-ghost" onClick=${()=>setEditing(false)}>Cancel</button></div></div>`:h`<div class="profile-info"><h2>${profile?.display_name||'User'}</h2><p class="text-secondary">${user?.email}</p><button class="btn-sm btn-ghost" onClick=${()=>{setDn(profile?.display_name||'');setEditing(true)}}>Edit Name</button></div>`}</div><div class="settings-list card"><button class="settings-item" onClick=${toggleTheme}><${Icon} name=${theme==='dark'?'sun':'moon'} size=${20}/><span>${theme==='dark'?'Light Mode':'Dark Mode'}</span></button></div><div class="card"><button class="settings-item danger" onClick=${signOut}><${Icon} name="logout" size=${20}/><span>Sign Out</span></button></div><p class="account-footer text-secondary">Roselle v1.0 • Made with 🌺</p></div>`}
+
+function App(){const{user,loading}=useAuth();if(loading)return h`<div class="loading-screen"><div class="loading-logo"><svg width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="var(--primary)" opacity=".2"/><path d="M24 8C24 8 32 16 32 24C32 32 24 40 24 40C24 40 16 32 16 24C16 16 24 8 24 8Z" fill="var(--primary)"/></svg></div><p>Loading...</p></div>`;const Guard=({children})=>user?children:h`<${Navigate} to="/login"/>`;return h`<div class="app-content"><${Routes}><${Route} path="/login" element=${user?h`<${Navigate} to="/"/>`:h`<${LoginPage}/>`}/><${Route} path="/" element=${h`<${Guard}><${Dashboard}/><//>`}/><${Route} path="/calendar" element=${h`<${Guard}><${CalendarPage}/><//>`}/><${Route} path="/log" element=${h`<${Guard}><${LogPage}/><//>`}/><${Route} path="/log/:date" element=${h`<${Guard}><${LogPage}/><//>`}/><${Route} path="/insights" element=${h`<${Guard}><${InsightsPage}/><//>`}/><${Route} path="/account" element=${h`<${Guard}><${AccountPage}/><//>`}/><${Route} path="*" element=${h`<${Navigate} to="/"/>`}/><//>${user&&h`<${BottomNav}/>`}</div>`}
+
+createRoot(document.getElementById('root')).render(h`<${HashRouter}><${ThemeProvider}><${AuthProvider}><${App}/><//><//><//>`)
+</script></body></html>
